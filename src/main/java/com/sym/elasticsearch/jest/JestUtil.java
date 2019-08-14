@@ -1,14 +1,7 @@
 package com.sym.elasticsearch.jest;
 
-import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.util.ArrayUtil;
-import cn.hutool.core.util.StrUtil;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import io.searchbox.client.JestClient;
-import io.searchbox.client.JestClientFactory;
 import io.searchbox.client.JestResult;
-import io.searchbox.client.config.HttpClientConfig;
 import io.searchbox.core.Bulk;
 import io.searchbox.core.Index;
 import io.searchbox.core.Search;
@@ -16,224 +9,86 @@ import io.searchbox.core.SearchResult;
 import io.searchbox.core.search.sort.Sort;
 import io.searchbox.indices.CreateIndex;
 import io.searchbox.indices.DeleteIndex;
-import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.commons.lang.StringUtils;
+import io.searchbox.indices.mapping.PutMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
+
 import java.io.IOException;
-import java.lang.reflect.Type;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
- * 使用Jest操作ES
- *
- * @Auther:
- * @Date: 2018-11-27 9:39
+ * jest查询工具类
+ * <p>
+ * Created by shenym on 2019/8/6 16:59.
  */
-
 public class JestUtil {
 
-    // 日志记录
     private final static Logger LOGGER = LoggerFactory.getLogger(JestUtil.class);
-    // 连接工厂
-    private static JestClientUtil jestClientUtil = new JestClientUtil();
+    private final static String TOTAL_KEY = "total";
+    private final static String ROWS_KEY = "rows";
+    private final static String DEFAULT_TYPE = "_doc";
 
     /**
-     * jest连接工厂
-     */
-    static class JestClientUtil{
-        private static String defaultFile = "jest.properties";// 默认配置文件路径
-        private static String defaultHost = "http://127.0.0.1:9200"; // 默认主机地址
-        private static Map<String, JestClient> clientMap;// 保存连接客户端
-        private static PropertiesConfiguration propertyConfig;// 用于读取配置文件
-
-        static {
-            clientMap = new ConcurrentHashMap<>();
-            init();
-            initClient(getHost());
-        }
-
-        /**
-         * 使用 PropertiesConfiguration 加载配置文件
-         */
-        private static void init() {
-            try {
-                LOGGER.info("加载配置文件：" + defaultFile);
-                propertyConfig = new PropertiesConfiguration();
-                propertyConfig.setEncoding("UTF-8");
-                propertyConfig.load(defaultFile);
-            } catch (Exception e) {
-                LOGGER.warn("加载配置文件 " + defaultFile + " 出错,原因：" + e.getMessage());
-                e.printStackTrace();
-            }
-        }
-
-        /**
-         * 获取配置文件内的主机地址
-         *
-         * @return
-         */
-        private static String[] getHost() {
-            List<String> retList = new ArrayList<>();
-            String cluster = propertyConfig.getString("cluster");
-            if (StringUtils.isBlank(cluster)) {
-                retList.add(defaultHost);
-            } else {
-                String[] hosts = cluster.split(",");
-                for (String host : hosts) {
-                    if (StringUtils.isNotBlank( host )) {
-                        retList.add(host);
-                    }
-                }
-            }
-            String[] retArray = new String[retList.size()];
-            LOGGER.info("获取到的主机地址为：" + retList);
-            return retList.toArray(retArray);
-        }
-
-
-        /**
-         * 初始化客户端连接
-         *
-         * @param hosts ES主机地址
-         */
-        private static void initClient(String... hosts) {
-            JestClientFactory factory = new JestClientFactory();
-            HttpClientConfig config;
-            String prefix = "http://";
-            for (String host : hosts) {
-                // 保存主机地址即可
-                int index = host.indexOf(":");
-                if (index == -1) {
-                    continue;
-                }
-                if (!clientMap.containsKey( host )) {
-                    // 这边需要继续完善，以便完成额外配置
-                    config = new HttpClientConfig.Builder(prefix + host).build();
-                    // 保存key和client
-                    clientMap.put(host.substring(0, index), factory.getObject());
-                    LOGGER.info("添加新的ES客户端，IP = {}", host);
-                }
-            }
-        }
-
-
-        /**
-         * 添加新的客户端
-         * @param ips 要添加的主机地址
-         */
-        public void addClient(String...ips){
-            initClient(ips);
-        }
-
-        /**
-         * 获取指定IP客户端
-         * @param ip
-         * @return
-         */
-        public JestClient getClient(String ip){
-            return clientMap.get(ip);
-        }
-
-        /**
-         * 关闭客户端
-         * @param ip
-         */
-        public void closeClient(String ip){
-            JestClient client = getClient(ip);
-            if (client == null) {
-                LOGGER.info("未初始化ip=" + ip + "的客户端");
-                return;
-            }
-            try {
-                clientMap.remove(ip);
-                client.close();
-                LOGGER.info("成功关闭ip=" + ip + "的客户端");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-    }
-
-    /**
-     * 添加新的客户端
+     * 新增一个索引
      *
-     * @param ips
+     * @param indexName 索引名称
+     * @param settings  索引配置
+     * @return true-创建成功，false-创建失败
      */
-    public static void addClient(String...ips) {
-        jestClientUtil.addClient(ips);
-    }
-
-
-    /**
-     * 获取客户端
-     *
-     * @param ip 主机地址
-     * @return
-     */
-    public static JestClient getClient(String ip) {
-        return jestClientUtil.getClient(ip);
-    }
-
-
-    /**
-     * 关闭客户端
-     *
-     * @param ip
-     */
-    public static void CloseClient(String ip) {
-        jestClientUtil.closeClient(ip);
-    }
-
-
-    /**
-     * 指定主机添加无配置的索引
-     *
-     * @param host
-     * @param indexName
-     * @return
-     */
-    public static boolean createIndex(String host, String indexName) {
-        return createIndex(host, indexName, null, null);
-    }
-
-
-    /**
-     * 指定主机添加带配置的索引
-     *
-     * @param host
-     * @param indexName
-     * @param settings
-     * @return
-     */
-    public static boolean createIndex(String host, String indexName, Map<String, Object> settings, Map<String, Object> mappings) {
-        if (StringUtils.isBlank(indexName)) {
-            throw new RuntimeException("索引名称不能为空");
+    public static boolean createIndex(String indexName, Map<String, Object> settings) {
+        if (StringUtils.isEmpty(indexName)) {
+            LOGGER.warn("索引名称不能为空");
+            return false;
         }
         CreateIndex.Builder builder = new CreateIndex.Builder(indexName);
         if (settings != null) {
             builder.settings(settings);
         }
-        if (mappings != null) {
-            builder.mappings(mappings);
-        }
         CreateIndex createIndex = builder.build();
-        JestClient client = getClient(host);
+        JestClient client = JestClientUtil.getJestClient();
         if (client == null) {
-            LOGGER.warn("客户端 " + host + " 未被初始化,无法添加索引");
+            LOGGER.warn("无法获取到JestClient客户端");
             return false;
-        } else {
-            try {
-                JestResult jestResult = client.execute(createIndex);
-                return jestResult.isSucceeded();
-            } catch (IOException e) {
-                LOGGER.warn("添加索引失败，host=" + host + "，原因：" + e.getMessage());
-                return false;
-            }
+        }
+        try {
+            JestResult jestResult = client.execute(createIndex);
+            return jestResult.isSucceeded();
+        } catch (IOException e) {
+            LOGGER.warn("添加索引{}失败,原因：{}", indexName, e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * 指定索引创建一个type
+     *
+     * @param indexName   索引名称
+     * @param typeName    类型名称
+     * @param mappingJson json串,形如:"{ \"my_type\" : { \"properties\" : { \"message\" : {\"type\" : \"string\", \"store\" : \"yes\"} } } }"
+     * @return
+     */
+    public static boolean putMapping(String indexName, String typeName, String mappingJson) {
+        if (org.apache.commons.lang3.StringUtils.isBlank(indexName)) {
+            LOGGER.warn("索引名称不能为空");
+            return false;
+        }
+        if (org.apache.commons.lang3.StringUtils.isBlank(mappingJson)) {
+            LOGGER.warn("mapping映射不能为空");
+            return false;
+        }
+        if( StringUtils.isEmpty(typeName) ) typeName = DEFAULT_TYPE;
+        PutMapping putMapping = new PutMapping.Builder(indexName, typeName, mappingJson).build();
+        try {
+            JestResult jestResult = JestClientUtil.getJestClient().execute(putMapping);
+            return jestResult.isSucceeded();
+        } catch (IOException e) {
+            LOGGER.warn("索引{},添加类型{}失败,原因：{}", indexName, typeName, e.getMessage());
+            return false;
         }
     }
 
@@ -241,182 +96,79 @@ public class JestUtil {
     /**
      * 删除索引
      *
-     * @param host
-     * @param indexName
-     * @return
+     * @param indexName 索引名称
+     * @return true-删除成功
      */
-    public static boolean deleteIndex(String host, String indexName) {
-        DeleteIndex build = new DeleteIndex.Builder(indexName).build();
-        JestClient client = getClient(host);
+    public static boolean deleteIndex(String indexName) {
+        if (org.apache.commons.lang3.StringUtils.isBlank(indexName)) {
+            LOGGER.warn("索引名称不能为空");
+            return false;
+        }
+        DeleteIndex deleteIndex = new DeleteIndex.Builder(indexName).build();
         try {
-            JestResult jestResult = client.execute(build);
+            JestResult jestResult = JestClientUtil.getJestClient().execute(deleteIndex);
             return jestResult.isSucceeded();
         } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-
-    /**
-     * 查询ES
-     *
-     * @param host  主机地址
-     * @param query 查询语句
-     * @return
-     */
-    public static SearchResult search(String host, String query) {
-        return search(host, query, null, null, null);
-    }
-
-
-    /**
-     * 查询ES
-     *
-     * @param host  主机地址
-     * @param query 查询语句
-     * @param index 查询索引
-     * @return
-     */
-    public static SearchResult search(String host, String query, String index) {
-        return search(host, query, index, null, null);
-    }
-
-
-    /**
-     * 查询ES
-     *
-     * @param host  主机地址
-     * @param query 查询语句
-     * @param index 查询索引
-     * @param type  类型
-     * @return
-     */
-    public static SearchResult search(String host, String query, String index, String type) {
-        return search(host, query, index, type, null);
-    }
-
-
-    /**
-     * 查询ES
-     *
-     * @param query 查询语句
-     * @param index 索引
-     * @param type  类型
-     * @param sorts 排序
-     * @return
-     */
-    public static SearchResult search(String host, String query, String index, String type, Sort... sorts) {
-        JestClient client = getClient(host);
-        if (client == null) {
-            LOGGER.warn("获取不到IP={}的客户端", host);
-            return null;
-        }
-        Search.Builder builder = new Search.Builder(query);
-        if (StringUtils.isNotBlank(index)) {
-            builder.addIndex(index);
-        }
-        if (StringUtils.isNotBlank(type)) {
-            builder.addType(type);
-        }
-        if (sorts != null && sorts.length > 0) {
-            builder.addSort(Arrays.asList(sorts));
-        }
-        Search search = builder.build();
-        try {
-            return client.execute(search);
-        } catch (IOException e) {
-            LOGGER.error("查询失败，原因：{}", e.getMessage());
-            return null;
+            LOGGER.error("删除索引{}失败，原因：{}", indexName, e.getMessage());
+            return false;
         }
     }
 
-
     /**
-     * 转换 SearchResult 为map
+     * 添加单条数据到ES
      *
-     * @param searchResult
-     * @return map包含total和rows
-     */
-    public static Map<String, Object> readSearchResultWithTotal(SearchResult searchResult) {
-        // 返回值
-        Map<String, Object> retMap = new HashMap<>();
-        retMap.put("total", 0);
-        retMap.put("rows", null);
-        // 查询结果为空
-        if (searchResult == null) {
-            return retMap;
-        }
-
-        // json转换工具
-        Type mapType = new TypeToken<Map<String, Object>>() {
-        }.getType();
-        Gson gson = new Gson();
-
-        // 查询失败
-        if (!searchResult.isSucceeded()) {
-            String errorMessage = searchResult.getErrorMessage();
-            Map<String, Object> map = gson.fromJson(errorMessage, mapType);
-            LOGGER.warn("查询失败，原因：" + map.get("reason"));
-            return retMap;
-        }
-        // 读取数据
-        Type listType = new TypeToken<List<Map<String, Object>>>() {
-        }.getType();
-        long total = searchResult.getTotal();
-        List<Map> sourceAsObjectList = searchResult.getSourceAsObjectList(Map.class, false);
-        retMap.put("total", total);
-        retMap.put("rows", sourceAsObjectList);
-        return retMap;
-    }
-
-
-    /**
-     * 添加单条数据到ES中
-     *
-     * @param host   ES节点地址
      * @param index  索引
      * @param type   类型
      * @param source 源数据
      * @return
      */
-    public static boolean addOne(String host, String index, String type, Object source) {
-        return addOne(host, index, type, source, null);
+    public static boolean addOne(String index, String type, Object source) {
+        return addOne(index, type, source, null);
     }
 
 
     /**
      * 添加单条数据到ES中
      *
-     * @param host
-     * @param index
-     * @param type
-     * @param source
-     * @param id
+     * @param index  索引
+     * @param type   类型
+     * @param source 数据
+     * @param _id    ES元数据
      * @return
      */
-    public static boolean addOne(String host, String index, String type, Object source, String id) {
-        if (StrUtil.isBlank(index) || StrUtil.isBlank(type)) {
-            LOGGER.warn("索引和类型不能为空");
+    public static boolean addOne(String index, String type, Object source, String _id) {
+        if (org.apache.commons.lang3.StringUtils.isBlank(index)) {
+            LOGGER.info("索引名称不能为空");
             return false;
         }
-        if (BeanUtil.isEmpty(source)) {
-            LOGGER.warn("源数据不能为空");
+        if ( null != source ) {
+            LOGGER.info("原数据不能为空");
             return false;
         }
-        JestClient client = getClient(host);
-        if (BeanUtil.isEmpty(client)) {
-            LOGGER.warn("找不到IP为 {} 的ES节点", host);
-            return false;
-        }
+        if( StringUtils.isEmpty(type) ) type = DEFAULT_TYPE;
         Index.Builder builder = new Index.Builder(source);
         builder.index(index);
         builder.type(type);
-        if (StrUtil.isNotBlank(id)) {
-            builder.id(id);
+        if (!StringUtils.isEmpty(_id)) {
+            builder.id(_id);
+        }
+        return addOne(builder.build());
+    }
+
+
+    /**
+     * 添加单条数据到ES中
+     *
+     * @param source 数据
+     * @return
+     */
+    public static boolean addOne(Index source) {
+        if (null == source) {
+            LOGGER.warn("原数据source不能为空");
+            return false;
         }
         try {
-            client.execute(builder.build());
+            JestClientUtil.getJestClient().execute(source);
             return true;
         } catch (IOException e) {
             LOGGER.error("添加数据失败，原因：{}", e.getMessage());
@@ -428,55 +180,144 @@ public class JestUtil {
     /**
      * 批量添加数据
      *
-     * @param host
-     * @param defaultIndex
-     * @param defaultType
-     * @param ts
+     * @param index 索引
+     * @param type  类型
+     * @param list  原数据集
      * @return
      */
-    public static <T> boolean addList(String host, String defaultIndex, String defaultType, T...ts) {
-        if (ArrayUtil.isEmpty(ts)) {
-            LOGGER.warn("对象数组为空");
+    public static <T> boolean addList(String index, String type, List<T> list) {
+        if (org.apache.commons.lang3.StringUtils.isBlank(index)) {
+            LOGGER.warn("索引名称不能为空");
             return false;
         }
-        JestClient client = getClient(host);
-        if (BeanUtil.isEmpty(client)) {
-            LOGGER.warn("主机地址不存在：{}", host);
+        if (null == list || list.size() == 0) {
+            LOGGER.warn("数据集合为空");
+            return false;
+        }
+        if( StringUtils.isEmpty(type) ) type = DEFAULT_TYPE;
+        final String typeName = type;
+        List<Index> indices = list.stream().map((source -> {
+            return new Index.Builder(source).index(index).type(typeName).build();
+        })).collect(Collectors.toList());
+        return addList(indices);
+    }
+
+
+    /**
+     * 批量添加数据
+     *
+     * @param list {@link Index}数据集合
+     * @return
+     */
+    public static boolean addList(List<Index> list) {
+        if (null == list || list.size() == 0) {
+            LOGGER.warn("数据集合为空");
             return false;
         }
         Bulk.Builder builder = new Bulk.Builder();
-        Stream<Index> stream = null;
-        Class componentType = ts.getClass().getComponentType();
-
-        if (componentType == Index.class) {
-            stream = Arrays.stream(ts).map((a) -> {
-                return (Index) a;
-            });
-        } else if( componentType == Index.Builder.class ){
-            stream = Arrays.stream(ts).map((a) -> {
-                Index.Builder builder1 = (Index.Builder) a;
-                return builder1.build();
-            });
-        } else {
-            if (StrUtil.isBlank(defaultIndex) || StrUtil.isBlank(defaultType)) {
-                LOGGER.warn("必须指定Index和type");
-                return false;
-            }
-            builder.defaultIndex(defaultIndex);
-            builder.defaultType(defaultType);
-            stream = Arrays.stream(ts).map((a) -> {
-                Index.Builder builder1 = new Index.Builder(a);
-                return builder1.build();
-            });
-        }
-        builder.addAction(stream.collect(Collectors.toList()));
+        builder.addAction(list);
         try {
-            client.execute(builder.build());
+            JestClientUtil.getJestClient().execute(builder.build());
             return true;
         } catch (IOException e) {
             LOGGER.error("批量增加失败，原因：{}", e.getMessage());
             return false;
         }
+    }
+
+
+    /**
+     * 查询ES
+     *
+     * @param query 查询语句
+     * @return
+     */
+    public static SearchResult search(String query) {
+        return search(null, null, query, null);
+    }
+
+
+    /**
+     * 查询ES
+     *
+     * @param index 查询索引
+     * @param type  类型
+     * @param query 查询语句
+     * @return
+     */
+    public static SearchResult search(String index, String type, String query) {
+        return search(index, type, query, null);
+    }
+
+
+    /**
+     * 查询ES
+     *
+     * @param index 索引
+     * @param type  类型
+     * @param query 查询语句
+     * @param sorts 排序
+     * @return
+     */
+    public static SearchResult search(String index, String type, String query, List<Sort> sorts) {
+        Search.Builder builder = new Search.Builder(query);
+        if (!StringUtils.isEmpty(index)) {
+            builder.addIndex(index);
+        }
+        if (!StringUtils.isEmpty(type)) {
+            builder.addType(type);
+        }
+        if (sorts != null && sorts.size() > 0) {
+            builder.addSort(sorts);
+        }
+        Search search = builder.build();
+        try {
+            return JestClientUtil.getJestClient().execute(search);
+        } catch (IOException e) {
+            LOGGER.error("查询失败，原因：{}", e.getMessage());
+            return null;
+        }
+    }
+
+
+    /**
+     * 解析SearchResult对象，并且封装总数total和数据row
+     *
+     * @param searchResult
+     * @param addEsMetadataFields
+     * @return map包含total和rows
+     */
+    public static Map<String, Object> parseResultWithTotalAndRow(SearchResult searchResult, boolean addEsMetadataFields) {
+        // 返回值
+        Map<String, Object> retMap = new HashMap<>();
+        retMap.put("total", 0);
+        retMap.put("rows", null);
+        // 查询结果为空
+        if (searchResult == null) return retMap;
+        // 查询失败
+        if (!searchResult.isSucceeded()) {
+            LOGGER.warn("查询失败，原因：{}", searchResult.getErrorMessage());
+            return retMap;
+        }
+        // 读取数据
+        long total = searchResult.getTotal();
+        List<Map> sourceAsObjectList = searchResult.getSourceAsObjectList(Map.class, addEsMetadataFields);
+        retMap.put(TOTAL_KEY, total);
+        retMap.put(ROWS_KEY, sourceAsObjectList);
+        return retMap;
+    }
+
+
+    /**
+     * 解析SearchResult对象，只获取ES元数据
+     *
+     * @param searchResult
+     * @param addEsMetadataFields
+     * @return 只包含原数据
+     */
+    public static List<Map> parseResultOnlySource(SearchResult searchResult, boolean addEsMetadataFields) {
+        if (null == searchResult || !searchResult.isSucceeded()) return Collections.emptyList();
+        return searchResult.getSourceAsObjectList(Map.class, addEsMetadataFields);
     }
 
 

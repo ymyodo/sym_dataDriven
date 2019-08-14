@@ -4,54 +4,81 @@ import io.searchbox.client.JestClient;
 import io.searchbox.client.JestClientFactory;
 import io.searchbox.client.config.HttpClientConfig;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
 
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
- * 获取一个Jest Client连接
+ * 基于Jest的es客户端工具类
  *
- * Created by shenYm on 2019/8/10.
+ * Created by shenym on 2019/8/6 16:38.
  */
-public class JestClientUtil {
+@Component
+public class JestClientUtil implements InitializingBean {
 
-    private static Map<String,JestClient> clientMap = new ConcurrentHashMap<>();
+    private final static Logger LOGGER = LoggerFactory.getLogger(JestClientUtil.class);
 
-    /**
-     * 通过配置类{@link HttpClientConfig}获取Jest Client连接
-     * @param clientConfig
-     * @return
-     */
-    public static JestClient getClient(HttpClientConfig clientConfig){
-        JestClientFactory factory = new JestClientFactory();
-        factory.setHttpClientConfig(clientConfig);
-        return factory.getObject();
-    }
+    private static final byte[] lock = new byte[0];
 
+    private static List<String> urlList;
 
-    public static JestClient getClient(String host){
-        HttpClientConfig config = new HttpClientConfig.Builder(host).maxTotalConnection(20).multiThreaded(true).readTimeout(60).build();
-        JestClientFactory factory = new JestClientFactory();
-        factory.setHttpClientConfig(config);
-        return factory.getObject();
-    }
+    /* 可以设计成单例，它接受批量的ES服务节点 */
+    private static JestClient jestClient = null;
 
+    @Autowired
+    private Environment env;
 
     /**
-     * 根据主机地址获取要保存到Map中的key
-     * @param key
-     * @return
+     * 获取一个jest的客户端连接
+     *
+     * @return JestClient(在jest中 JestClient是一个单例)
      */
-    private static String getKey(String key){
-        if(StringUtils.isBlank( key )) return "";
-        key = key.replaceAll("http://","");
-        if( !key.contains(":") ){
-            key += ":9200";
+    public static JestClient getJestClient(){
+        if( null == jestClient ){
+            synchronized ( lock ){
+                if( null == jestClient ){
+                    JestClientFactory factory = new JestClientFactory();
+                    // 后面有额外配置,直接在这边改
+                    factory.setHttpClientConfig(new HttpClientConfig.Builder(urlList)
+                            .multiThreaded(true)
+                            .maxTotalConnection(20)
+                            .build());
+                    jestClient = factory.getObject();
+                }
+                return jestClient;
+            }
+        }else{
+            return jestClient;
         }
-        return key;
     }
 
 
-
+    /**
+     * 将配置的ES节点地址(逗号隔开)转换为List
+     * @throws Exception
+     */
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        urlList = new ArrayList<>();
+        String urls = env.getProperty("es.jest.common.urls");
+        if(StringUtils.isBlank( urls )){
+            LOGGER.info("未获取到任何ES节点地址配置,使用默认地址：127.0.0.1:9200");
+            urlList.add("127.0.0.1:9200");
+        }else{
+            LOGGER.info("获取到ES节点地址配置：{}",urls);
+            String[] urlArray = urls.split(",");
+            Arrays.stream(urlArray).forEach(url->{
+                if( !StringUtils.isBlank(url) ){
+                    urlList.add(url);
+                }
+            });
+        }
+    }
 }

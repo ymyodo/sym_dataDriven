@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+    用户信息Mapper
+-->
+<properties>
+
+    <!--模糊搜索客户姓名-->
+    <property name="fuzzySearchByFullName">
+        <![CDATA[
+            {
+                "query":{
+                    "wildcard":{
+                        "full_name":{
+                            "value":#[full_name]
+                        }
+                    }
+                },
+                "from":#[from],
+                "size":#[size]
+            }
+        ]]>
+    </property>
+
+</properties>
