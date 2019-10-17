@@ -1,13 +1,9 @@
 package com.sym.redis.redisson;
 
 import org.junit.Test;
-import org.redisson.Redisson;
 import org.redisson.api.RBucket;
 import org.redisson.api.RedissonClient;
-import org.redisson.codec.JsonJacksonCodec;
-import org.redisson.config.Config;
 
-import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -24,7 +20,7 @@ public class RedissonDemo {
      */
     @Test
     public void testOne(){
-        RedissonClient client = this.getInstance();
+        RedissonClient client = RedissonClientUtil.getRedissonClient();
 
         /*
          * 设置一个Key
@@ -52,29 +48,5 @@ public class RedissonDemo {
         bucket.delete();
     }
 
-    /**
-     * 获取一个Redisson客户操作端
-     */
-    private RedissonClient getInstance() {
-        Config config = new Config();
-        /*
-         * config.use***()方法表示使用redis的何种方式，例如单机模式、主从模式、哨兵模式和集群模式...
-         */
-        config.setCodec(new JsonJacksonCodec())
-                .useSingleServer().setAddress("redis://127.0.0.1:6379")
-                .setDatabase(0)
-                .setConnectionPoolSize(10)
-                .setConnectionMinimumIdleSize(10)
-                //.setClientName("客户端测试一号")
-                .setConnectTimeout(30);
-        RedissonClient redissonClient = Redisson.create(config);
-        try {
-            String s = redissonClient.getConfig().toJSON();
-            System.out.println(s);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return redissonClient;
-    }
 
 }
