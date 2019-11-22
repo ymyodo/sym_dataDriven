@@ -1,4 +1,4 @@
-package com.sym.rabbitmq.driver;
+package com.sym.rabbitmq;
 
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;

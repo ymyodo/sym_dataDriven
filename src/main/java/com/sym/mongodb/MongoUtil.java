@@ -1,4 +1,4 @@
-package com.sym.mongodb.driver;
+package com.sym.mongodb;
 
 import com.mongodb.Block;
 import com.mongodb.MongoClient;
@@ -8,7 +8,6 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
-import com.sym.mongodb.pojo.Person;
 import org.bson.Document;
 import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;

@@ -1,14 +1,11 @@
 package com.sym.elasticsearch.bboss;
 
-import org.apache.commons.lang3.StringUtils;
+import com.frameworkset.util.StringUtil;
 import org.frameworkset.elasticsearch.ElasticSearchHelper;
+import org.frameworkset.elasticsearch.boot.ElasticSearchPropertiesFilePlugin;
 import org.frameworkset.elasticsearch.client.ClientInterface;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
-import org.springframework.stereotype.Component;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -18,8 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * Created by shenym on 2019/8/7 16:54.
  */
-@Component
-public class BbossClientUtil implements InitializingBean {
+public class BbossClientUtil {
 
     private final static byte[] LOCK_OBJECT = new byte[0];
 
@@ -31,8 +27,10 @@ public class BbossClientUtil implements InitializingBean {
 
     private static String location;
 
-    @Autowired
-    private Environment env;
+    static {
+        // 如果不设置配置文件, bboss默认会去读取classpath:/application.properties
+        ElasticSearchPropertiesFilePlugin.init("properties/bboss.properties");
+    }
 
 
     /**
@@ -105,10 +103,6 @@ public class BbossClientUtil implements InitializingBean {
 
 
 
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        location = env.getProperty("elasticsearch.location");
-    }
 
 
     /**
@@ -121,7 +115,7 @@ public class BbossClientUtil implements InitializingBean {
         if( !baseLocation.endsWith("/") ){
             baseLocation += "/";
         }
-        if(StringUtils.isNoneBlank(mapperPath)){
+        if(!StringUtil.isEmpty(mapperPath)){
             if( mapperPath.startsWith("/") ){
                 mapperPath = mapperPath.substring(1);
             }

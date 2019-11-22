@@ -62,8 +62,7 @@ public class RedissonClientUtil {
                 .setConnectTimeout(30);
         RedissonClient redissonClient = Redisson.create(config);
         try {
-            String s = redissonClient.getConfig().toJSON();
-            System.out.println(s);
+            redissonClient.getConfig().toJSON();
         } catch (IOException e) {
             e.printStackTrace();
         }

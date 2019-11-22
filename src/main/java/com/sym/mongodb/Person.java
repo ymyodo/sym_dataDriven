@@ -1,4 +1,4 @@
-package com.sym.mongodb.pojo;
+package com.sym.mongodb;
 
 import lombok.Data;
 

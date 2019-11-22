@@ -1,5 +1,6 @@
 package com.sym.elasticsearch.jest;
 
+import com.frameworkset.util.StringUtil;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
 import io.searchbox.core.Bulk;
@@ -10,9 +11,9 @@ import io.searchbox.core.search.sort.Sort;
 import io.searchbox.indices.CreateIndex;
 import io.searchbox.indices.DeleteIndex;
 import io.searchbox.indices.mapping.PutMapping;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -41,7 +42,7 @@ public class JestUtil {
      * @return true-创建成功，false-创建失败
      */
     public static boolean createIndex(String indexName, Map<String, Object> settings) {
-        if (StringUtils.isEmpty(indexName)) {
+        if (StringUtil.isEmpty(indexName)) {
             LOGGER.warn("索引名称不能为空");
             return false;
         }
@@ -73,7 +74,7 @@ public class JestUtil {
      * @return
      */
     public static boolean putMapping(String indexName, String typeName, String mappingJson) {
-        if (org.apache.commons.lang3.StringUtils.isBlank(indexName)) {
+        if (StringUtils.isBlank(indexName)) {
             LOGGER.warn("索引名称不能为空");
             return false;
         }
@@ -81,7 +82,7 @@ public class JestUtil {
             LOGGER.warn("mapping映射不能为空");
             return false;
         }
-        if( StringUtils.isEmpty(typeName) ) typeName = DEFAULT_TYPE;
+        if (StringUtils.isBlank(typeName)) typeName = DEFAULT_TYPE;
         PutMapping putMapping = new PutMapping.Builder(indexName, typeName, mappingJson).build();
         try {
             JestResult jestResult = JestClientUtil.getJestClient().execute(putMapping);
@@ -141,11 +142,11 @@ public class JestUtil {
             LOGGER.info("索引名称不能为空");
             return false;
         }
-        if ( null != source ) {
+        if (null != source) {
             LOGGER.info("原数据不能为空");
             return false;
         }
-        if( StringUtils.isEmpty(type) ) type = DEFAULT_TYPE;
+        if (StringUtils.isEmpty(type)) type = DEFAULT_TYPE;
         Index.Builder builder = new Index.Builder(source);
         builder.index(index);
         builder.type(type);
@@ -194,7 +195,7 @@ public class JestUtil {
             LOGGER.warn("数据集合为空");
             return false;
         }
-        if( StringUtils.isEmpty(type) ) type = DEFAULT_TYPE;
+        if (StringUtils.isEmpty(type)) type = DEFAULT_TYPE;
         final String typeName = type;
         List<Index> indices = list.stream().map((source -> {
             return new Index.Builder(source).index(index).type(typeName).build();

@@ -1,4 +1,4 @@
-package com.sym.mongodb.driver;
+package com.sym.mongodb;
 // 使用静态导入，省去写"Filters."
 
 import org.bson.Document;
