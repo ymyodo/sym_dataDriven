@@ -59,8 +59,6 @@ public class RabbitMQConnectUtil {
 
     /**
      * 获取一个通道
-     *
-     * @return
      */
     public static Channel getChannel() {
         Channel channel = threadLocal.get();

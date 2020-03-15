@@ -9,16 +9,18 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * @Auther: shenym
- * @Date: 2019-03-28 11:46
+ * jedis测试类
+ *
+ * @author shenym
+ * @date 2019-03-28 11:46
  */
-public class JedisDemo {
+public class JedisTest {
 
     /**
      * 单节点访问
      */
     @Test
-    public void testOne(){
+    public void initialize(){
         // 连接单个redis节点
         Jedis jedis = new Jedis("127.0.0.1",6379);
         jedis.auth("root");//redis访问密码
@@ -30,7 +32,7 @@ public class JedisDemo {
      * 使用连接池
      */
     @Test
-    public void testTwo(){
+    public void jedisPool(){
         // 连接配置
         JedisPoolConfig poolConfig = new JedisPoolConfig();
         poolConfig.setMaxTotal(10);
@@ -47,7 +49,7 @@ public class JedisDemo {
      * 集群访问
      */
     @Test
-    public void testThree(){
+    public void cluster(){
         // 只需要指定集群内的一个节点即可
         HostAndPort hostAndPort = new HostAndPort("10.23.119.56",6379);
         JedisCluster jedisCluster = new JedisCluster(hostAndPort);
@@ -63,7 +65,7 @@ public class JedisDemo {
      * 使用连接池
      */
     @Test
-    public void testFour(){
+    public void clusterFromPool(){
         // 连接配置
         GenericObjectPoolConfig poolConfig = new GenericObjectPoolConfig();
         poolConfig.setMaxTotal(10);
@@ -81,7 +83,7 @@ public class JedisDemo {
      * jedis发布与订阅
      */
     @Test
-    public void testFive(){
+    public void pulAndSub(){
         Jedis jedis = new Jedis("127.0.0.1",6379);
         jedis.auth("root");
         JedisPubSub jedisPubSub = new JedisPubSub() {
@@ -89,7 +91,6 @@ public class JedisDemo {
             public void subscribe(String... channels) {
                 super.subscribe(channels);
             }
-
             @Override
             public void onMessage(String channel, String message) {
                 System.out.println(channel);
@@ -97,10 +98,5 @@ public class JedisDemo {
             }
         };
         jedis.subscribe(jedisPubSub,"redisLock");
-
-    }
-    
-    public static void main(String[] args){
-
     }
 }

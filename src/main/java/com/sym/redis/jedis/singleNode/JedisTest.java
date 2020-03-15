@@ -35,7 +35,7 @@ public class JedisTest {
 	}
 
 	@Test
-	public void getset() {
+	public void getAndSet() {
 		String str = jedis.getSet("str", "沈燕明你是最棒的");
 		System.out.println(str);
 		String strNew = jedis.get("str");

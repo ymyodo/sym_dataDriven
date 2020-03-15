@@ -2,7 +2,6 @@ package com.sym.datasource.HikariCP;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import org.junit.Test;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -13,7 +12,7 @@ import java.sql.SQLException;
  *
  * Created by shenym on 2019/11/22.
  */
-public class HikariCPDataSource {
+public class _HikariCPDataSource {
 
     /*
      * HikariCP的数据源, 里面定制了一个连接池, 存放JDBC的连接：Connection
@@ -35,20 +34,12 @@ public class HikariCPDataSource {
     /**
      * 获取连接
      */
-    public static Connection getConnection(){
+    public static Connection getConnection() {
         try {
             return dataSource.getConnection();
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return null;
-    }
-
-    @Test
-    public void speedTest(){
-        for(int i=0; i<10; i++){
-            Connection connection = getConnection();
-            System.out.println(connection);
-        }
     }
 }

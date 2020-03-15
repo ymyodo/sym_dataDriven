@@ -1,4 +1,4 @@
-package com.sym.redis.jedis.listen;
+package com.sym.redis.jedis.listener;
 import redis.clients.jedis.JedisPubSub;
 /**
  * 用java实现Redis 超时失效key 的监听触发

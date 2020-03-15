@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit;
  *
  * Created by shenym on 2019/9/23.
  */
-public class RedissonDemo {
+public class RedissonTest {
 
     /**
      * 设置key、获取key、修改Key、删除Key

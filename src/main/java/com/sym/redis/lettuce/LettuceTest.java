@@ -9,6 +9,7 @@ import com.lambdaworks.redis.api.sync.RedisCommands;
 import com.lambdaworks.redis.cluster.RedisClusterClient;
 import com.lambdaworks.redis.cluster.api.StatefulRedisClusterConnection;
 import com.lambdaworks.redis.cluster.api.sync.RedisAdvancedClusterCommands;
+import org.junit.Test;
 
 
 import java.util.concurrent.ExecutionException;
@@ -17,13 +18,14 @@ import java.util.concurrent.ExecutionException;
  * @Auther: shenym
  * @Date: 2019-03-29 15:18
  */
-public class LettuceDemo {
+public class LettuceTest {
 
     /**
      * 单机模式-redisClient
      * 同步操作
      */
-    public void testOne() {
+    @Test
+    public void syncWithNode() {
         RedisURI redisURI = RedisURI.builder().withHost("127.0.0.1").withPort(6379).withPassword("root").build();
         RedisClient redisClient = RedisClient.create(redisURI);
         StatefulRedisConnection<String, String> connect = redisClient.connect();
@@ -37,7 +39,8 @@ public class LettuceDemo {
      * 单机模式-redisClient
      * 异步操作
      */
-    public void testTwo() {
+    @Test
+    public void asyncWithNode() {
         RedisURI redisURI = RedisURI.builder().withHost("127.0.0.1").withPort(6379).withPassword("root").build();
         RedisClient redisClient = RedisClient.create(redisURI);
         StatefulRedisConnection<String, String> connect = redisClient.connect();
@@ -55,7 +58,8 @@ public class LettuceDemo {
     /**
      * 集群模式-RedisClusterClient
      */
-    public void testThree() {
+    @Test
+    public void cluster() {
         RedisURI redisURI = RedisURI.builder().withHost("10.23.119.56").withPort(6379).build();
         RedisClusterClient clusterClient = RedisClusterClient.create(redisURI);
         StatefulRedisClusterConnection<String, String> connect = clusterClient.connect();

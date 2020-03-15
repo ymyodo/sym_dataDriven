@@ -1,4 +1,4 @@
-package com.sym.redis.jedis.listen;
+package com.sym.redis.jedis.listener;
 import com.sym.redis.jedis.singleNode.JedisPoolUtil;
 import redis.clients.jedis.Jedis;
 /**

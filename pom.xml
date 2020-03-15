@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.sym</groupId>
-    <artifactId>opera-database-mq</artifactId>
+    <artifactId>driver</artifactId>
     <version>0.0.1-SNAPSHOT</version>
 
     <name>Java操作数据库与消息队列</name>

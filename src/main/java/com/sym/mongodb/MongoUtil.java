@@ -18,10 +18,13 @@ import java.io.IOException;
 import java.util.*;
 
 public class MongoUtil {
+
 	// 连接mongodb的客户端
 	private static MongoClient client;
+
 	// 支持多线程，每个用户操作的Mongo的数据库不一样
 	private static ThreadLocal<MongoDatabase> threadLocal;
+
 	static{
 		// 加载配置文件，获取MongoDB的主机地址和端口号
 		Properties prop = new Properties();
@@ -56,7 +59,6 @@ public class MongoUtil {
 
 	/**
 	 * 获取当前操作的数据库
-	 * @return
 	 */
 	public static MongoDatabase getDatabase(){
 		return initDatabase();
@@ -64,8 +66,6 @@ public class MongoUtil {
 
 	/**
 	 * 切换当前操作的数据库
-	 * @param databaseName
-	 * @return
 	 */
 	public static MongoDatabase setDatabase(String databaseName){
 		MongoDatabase database = client.getDatabase(databaseName);
@@ -73,11 +73,8 @@ public class MongoUtil {
 		return database ;
 	}
 
-
 	/**
 	 * 获取指定集合
-	 * @param collection
-	 * @return
 	 */
 	public static MongoCollection<Document> getCollection(String collection){
 		MongoDatabase database = initDatabase();
@@ -86,10 +83,8 @@ public class MongoUtil {
 
 	/**
 	 * 删除一个集合
-	 * @param collection
-	 * @return
 	 */
-	public static boolean deleteColletion(String collection){
+	public static boolean deleteCollection(String collection){
 		try {
 			MongoDatabase database = initDatabase();
 			database.getCollection(collection).drop();
@@ -102,8 +97,6 @@ public class MongoUtil {
 
 	/**
 	 * 插入单个文档数据
-	 * @param collection
-	 * @param param
 	 */
 	public static void insertOne(String collection, Map<String, Object> param){
 		Document doc = new Document();
@@ -116,8 +109,6 @@ public class MongoUtil {
 
 	/**
 	 * 插入单个文档数据
-	 * @param collection
-	 * @param doc
 	 */
 	public static void insertOne(String collection, Document doc){
 		MongoCollection<Document> mongoCollection = getCollection(collection);
@@ -126,8 +117,6 @@ public class MongoUtil {
 
 	/**
 	 * 插入多个文档数据
-	 * @param col
-	 * @param params
 	 */
 	public static void insertMany(String col, List<Document> params){
 		MongoCollection<Document> mc = getCollection(col);
@@ -136,26 +125,20 @@ public class MongoUtil {
 
 	/**
 	 * 根据查询条件获取单个文档记录
-	 * @param collection
-	 * @param bson
-	 * @return
 	 */
 	public static Map<String, Object> findOne(String collection, Bson bson){
 		MongoCollection<Document> table = getCollection(collection);
 		Document document = table.find(bson).first();
 		Map<String, Object> map = new HashMap<>();
+		assert document != null;
 		for( Map.Entry<String, Object> entry : document.entrySet()){
 			map.put(entry.getKey(), entry.getValue());
 		}
 		return map;
 	}
 
-
 	/**
 	 * 根据查询条件获取多个文档记录
-	 * @param col
-	 * @param bson
-	 * @return
 	 */
 	public static List<Map<String, Object>> findMany(String col, Bson bson){
 		List<Map<String, Object>> resList = new ArrayList<>();
@@ -174,24 +157,17 @@ public class MongoUtil {
 		return resList;
 	}
 
-
 	/**
 	 * 返回集合中的所有文档
-	 * @param colletion
-	 * @return
 	 */
 	public static List<Map<String,Object>> findAll(String collection){
 		MongoCollection<Document> table = getCollection(collection);
 		List<Map<String, Object>> res = new ArrayList<Map<String,Object>>();
-		Block<Document> block = new Block<Document>() {
-
-			@Override
-			public void apply(Document t) {
-				Map<String, Object> map = new HashMap<>();
-				for( Map.Entry<String, Object> e : t.entrySet()){
-					map.put(e.getKey(), e.getValue());
-					res.add(map);
-				}
+		Block<Document> block = t -> {
+			Map<String, Object> map = new HashMap<>();
+			for( Map.Entry<String, Object> e : t.entrySet()){
+				map.put(e.getKey(), e.getValue());
+				res.add(map);
 			}
 		};
 		table.find().forEach(block);;
@@ -201,10 +177,6 @@ public class MongoUtil {
 
 	/**
 	 * 修改一个文档
-	 * @param col
-	 * @param filter
-	 * @param newDoc
-	 * @return
 	 */
 	public static long updateOne(String col, Bson filter, Document newDoc){
 		MongoCollection<Document> table = getCollection(col);
@@ -215,10 +187,6 @@ public class MongoUtil {
 
 	/**
 	 * 修改多个文档
-	 * @param col
-	 * @param filter
-	 * @param newDoc
-	 * @return
 	 */
 	public static long updateMany(String col, Bson filter, Document newDoc){
 		MongoCollection<Document> table = getCollection(col);
@@ -228,8 +196,6 @@ public class MongoUtil {
 
 	/**
 	 * 删除一个文档
-	 * @param bson
-	 * @return
 	 */
 	public static long deleteOne(String collection, Bson filter){
 		MongoCollection<Document> table = getCollection(collection);
@@ -239,9 +205,6 @@ public class MongoUtil {
 
 	/**
 	 * 删除多个文档
-	 * @param collection
-	 * @param filter
-	 * @return
 	 */
 	public static long deleteMany(String collection, Bson filter){
 		MongoCollection<Document> table = getCollection(collection);
@@ -251,9 +214,6 @@ public class MongoUtil {
 
 	/**
 	 * 创建索引
-	 * @param collection
-	 * @param doc
-	 * @return
 	 */
 	public static boolean createIndex(String collection, Document doc){
 		MongoCollection<Document> table = getCollection(collection);
@@ -265,27 +225,5 @@ public class MongoUtil {
 			return false;
 		}
 	}
-
-	public static void main(String[] args) {
-		/**
-		 * 这种方式可以让MongoDB一个集合对应Java中的一个JavaBean
-		 */
-		CodecRegistry registries = CodecRegistries.fromRegistries(MongoClient.getDefaultCodecRegistry(),
-				CodecRegistries.fromProviders(PojoCodecProvider.builder().automatic(true).build()));
-		MongoClientSettings settings = MongoClientSettings.builder().codecRegistry(registries).build();
-		com.mongodb.client.MongoClient client = MongoClients.create(settings);
-		MongoDatabase database = client.getDatabase("test");
-		database.withCodecRegistry(registries);
-		MongoCollection<Person> personTable = database.getCollection("person", Person.class);
-		personTable = personTable.withCodecRegistry(registries);
-		Person person = new Person();
-		person.setName("警察");
-		person.setDel(false);
-		person.setBad(250);
-		person.setGood(500);
-		personTable.insertOne(person);
-	}
-
-
 
 }

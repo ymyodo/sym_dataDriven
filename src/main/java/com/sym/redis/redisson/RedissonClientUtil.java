@@ -1,6 +1,5 @@
 package com.sym.redis.redisson;
 
-import org.junit.Test;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.codec.JsonJacksonCodec;
@@ -15,12 +14,6 @@ import java.io.InputStream;
  * Created by 沈燕明 on 2019/10/14 22:09.
  */
 public class RedissonClientUtil {
-
-    @Test
-    public void test() throws IOException {
-        RedissonClientUtil.getSingleNodeConfig();
-        RedissonClientUtil.getClusterConfig();
-    }
 
     /**
      * 通过yaml文件获取单节点配置

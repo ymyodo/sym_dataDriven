@@ -11,7 +11,7 @@ import org.junit.Test;
  *
  * Created by 沈燕明 on 2019/8/4.
  */
-public class TestByLocal {
+public class MainTest {
 
     @Before
     public void init(){

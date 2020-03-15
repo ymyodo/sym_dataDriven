@@ -1,4 +1,4 @@
-package com.sym.mongodb;
+package com.sym.mongodb.domain;
 
 import lombok.Data;
 
