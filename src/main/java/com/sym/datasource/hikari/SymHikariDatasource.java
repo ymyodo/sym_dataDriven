@@ -1,33 +1,34 @@
 package com.sym.datasource.hikari;
 
+import com.sym.util.PropertiesUtil;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Properties;
 
 /**
- * HikariCP的官方文档：
- * @see <a href="https://github.com/brettwooldridge/HikariCP#configuration-knobs-baby"></a>
+ * HikariCP的官方文档：https://github.com/brettwooldridge/HikariCP#configuration-knobs-baby
  *
- * Created by shenym on 2019/11/22.
+ * @author ym.shen
+ * Created on 2019/11/22.
  */
-public class _HikariCPDataSource {
+public class SymHikariDatasource {
+    public static void main(String[] args) {
+        SymHikariDatasource.getConnection();
+    }
 
-    /*
+    /**
      * HikariCP的数据源, 里面定制了一个连接池, 存放JDBC的连接：Connection
      */
     private static HikariDataSource dataSource;
 
     static {
-        // 这种方式是直接设置
-        HikariConfig config = new HikariConfig();
-        config.setJdbcUrl("jdbc:mysql://localhost:3306/spring");
-        config.setUsername("root");
-        config.setPassword("root");
-        config.addDataSourceProperty("cachePrepStmts", "true");
-        config.addDataSourceProperty("prepStmtCacheSize", "250");
-        config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
+        // 将 hikari.properties解析成配置文件
+        Properties properties = PropertiesUtil.loadProperties("datasource/hikari.properties");
+        HikariConfig config = new HikariConfig(properties);
+        // 实例化数据源
         dataSource = new HikariDataSource(config);
     }
 
