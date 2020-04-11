@@ -71,16 +71,18 @@
         </dependency>
 
 
-        <!-- 用于读取properties和xml文件 -->
+        <!-- zookeeper -->
+        <!-- 使用curator与zk有版本要求, curator 4.x以上需要zk版本3.5x.-->
+        <!--我的zk版本是3.4x, 要么使用低版本的curator, 要么就排除掉curator自带的zk驱动, 然后再引入对应版本的zk驱动-->
         <dependency>
-            <groupId>commons-collections</groupId>
-            <artifactId>commons-collections</artifactId>
-            <version>3.2.2</version>
+            <groupId>org.apache.curator</groupId>
+            <artifactId>curator-framework</artifactId>
+            <version>2.13.0</version>
         </dependency>
         <dependency>
-            <groupId>commons-configuration</groupId>
-            <artifactId>commons-configuration</artifactId>
-            <version>1.10</version>
+            <groupId>org.apache.curator</groupId>
+            <artifactId>curator-recipes</artifactId>
+            <version>2.13.0</version>
         </dependency>
 
 
@@ -99,6 +101,19 @@
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>5.1.17</version>
+        </dependency>
+
+
+        <!-- 用于读取properties和xml文件 -->
+        <dependency>
+            <groupId>commons-collections</groupId>
+            <artifactId>commons-collections</artifactId>
+            <version>3.2.2</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-configuration</groupId>
+            <artifactId>commons-configuration</artifactId>
+            <version>1.10</version>
         </dependency>
 
 
