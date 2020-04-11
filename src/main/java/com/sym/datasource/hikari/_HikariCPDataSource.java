@@ -1,4 +1,4 @@
-package com.sym.datasource.HikariCP;
+package com.sym.datasource.hikari;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
