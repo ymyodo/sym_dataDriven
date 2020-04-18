@@ -1,5 +1,6 @@
 package com.sym;
 
+import com.sym.zookeeper.curator.CuratorTemplate;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestClientFactory;
 import io.searchbox.client.config.HttpClientConfig;
@@ -33,4 +34,10 @@ public class MainTest {
         // 事实证明Jest没做单例处理
     }
 
+    @Test
+    public void zkTest() throws Exception {
+        CuratorTemplate template = new CuratorTemplate();
+        byte[] data = template.getData("/dubbo");
+        System.out.println(data);
+    }
 }

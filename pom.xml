@@ -72,15 +72,17 @@
 
 
         <!-- zookeeper -->
+        <!-- 使用curator与zk有版本要求, curator 4.x以上需要zk版本3.5x.-->
+        <!--我的zk版本是3.4x, 要么使用低版本的curator, 要么就排除掉curator自带的zk驱动, 然后再引入对应版本的zk驱动-->
         <dependency>
-            <groupId>org.apache.zookeeper</groupId>
-            <artifactId>zookeeper</artifactId>
-            <version>3.6.0</version>
+            <groupId>org.apache.curator</groupId>
+            <artifactId>curator-framework</artifactId>
+            <version>2.13.0</version>
         </dependency>
         <dependency>
-            <groupId>com.101tec</groupId>
-            <artifactId>zkclient</artifactId>
-            <version>0.11</version>
+            <groupId>org.apache.curator</groupId>
+            <artifactId>curator-recipes</artifactId>
+            <version>2.13.0</version>
         </dependency>
 
 
@@ -121,6 +123,8 @@
             <version>1.18.8</version>
             <scope>provided</scope>
         </dependency>
+
+
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
