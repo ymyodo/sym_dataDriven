@@ -71,8 +71,7 @@ public class ZookeeperClientUtil {
             } else {
                 zookeeper = new ZooKeeper(connectionString, sessionTimeout, watcherProxy, canBeReadOnly);
             }
-            // countDownLatch.await(connectionTimeout, TimeUnit.MILLISECONDS);
-            countDownLatch.await();
+            countDownLatch.await(connectionTimeout, TimeUnit.MILLISECONDS);
             if(zookeeper.getState() != ZooKeeper.States.CONNECTED){
                 throw new TimeoutException("连接zookeeper超时");
             }
