@@ -15,8 +15,7 @@
     </properties>
 
     <dependencies>
-
-        <!-- es -->
+        <!-- elasticsearch -->
         <dependency>
             <groupId>io.searchbox</groupId>
             <artifactId>jest</artifactId>
@@ -26,8 +25,13 @@
             <groupId>com.bbossgroups.plugins</groupId>
             <artifactId>bboss-elasticsearch-rest-jdbc</artifactId>
             <version>5.8.6</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
-
 
         <!-- redis -->
         <dependency>
@@ -46,14 +50,12 @@
             <version>3.0.1</version>
         </dependency>
 
-
         <!-- mongodb -->
         <dependency>
             <groupId>org.mongodb</groupId>
             <artifactId>mongo-java-driver</artifactId>
             <version>3.8.2</version>
         </dependency>
-
 
         <!-- neo4j -->
         <dependency>
@@ -62,7 +64,6 @@
             <version>3.5.12</version>
         </dependency>
 
-
         <!-- rabbitmq -->
         <dependency>
             <groupId>com.rabbitmq</groupId>
@@ -70,6 +71,25 @@
             <version>5.5.0</version>
         </dependency>
 
+        <!-- kafka -->
+        <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka-clients</artifactId>
+            <version>2.3.0</version>
+        </dependency>
+
+        <!-- rocketMQ -->
+        <dependency>
+            <groupId>org.apache.rocketmq</groupId>
+            <artifactId>rocketmq-client</artifactId>
+            <version>4.6.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-slf4j-impl</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 
         <!-- zookeeper -->
         <!-- 使用curator与zk有版本要求, curator 4.x以上需要zk版本3.5x.-->
@@ -85,8 +105,7 @@
             <version>2.13.0</version>
         </dependency>
 
-
-        <!-- 关系型数据库, 数据源 -->
+        <!-- 数据源 -->
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>druid</artifactId>
@@ -102,7 +121,6 @@
             <artifactId>mysql-connector-java</artifactId>
             <version>5.1.17</version>
         </dependency>
-
 
         <!-- 用于读取properties和xml文件 -->
         <dependency>
@@ -138,14 +156,12 @@
             <version>1.2.3</version>
         </dependency>
 
-
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>1.18.8</version>
             <scope>provided</scope>
         </dependency>
-
 
         <dependency>
             <groupId>junit</groupId>
