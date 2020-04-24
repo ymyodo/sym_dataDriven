@@ -83,12 +83,12 @@ public class ZookeeperClientUtil {
     }
 
     /**
-     * 监听器代理期
+     * 监听器代理器
      */
     private static class WatchProxy {
 
         private static ClassLoader classLoader = WatchProxy.class.getClassLoader();
-        private static Class[] classes = new Class[]{Watcher.class};
+        private static Class<?>[] classes = new Class[]{Watcher.class};
         /**
          * 默认监听器
          */
