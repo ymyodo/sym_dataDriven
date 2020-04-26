@@ -1,5 +1,6 @@
-package com.sym.zookeeper.curator;
+package com.sym.zookeeper.curator.example;
 
+import com.sym.zookeeper.curator.CuratorClientUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.api.ACLBackgroundPathAndBytesable;
@@ -9,6 +10,7 @@ import org.apache.curator.framework.api.SetDataBuilder;
 import org.apache.curator.framework.api.transaction.CuratorTransaction;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.KeeperException;
+import org.apache.zookeeper.data.Stat;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -16,19 +18,19 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- * {@link CuratorFramework}的使用
+ * {@link CuratorFramework}的基本使用用例
  *
  * @author ym.shen
  * Created on 2020/4/10 17:24
  */
 @Slf4j
-public class CuratorTemplate {
+public class CuratorBaseTemplate {
 
     private static final Charset DEFAULT_CHARSET_UTF8 = StandardCharsets.UTF_8;
 
     private CuratorFramework curatorFramework;
 
-    public CuratorTemplate() {
+    public CuratorBaseTemplate() {
         curatorFramework = CuratorClientUtil.getClient();
     }
 
@@ -108,6 +110,10 @@ public class CuratorTemplate {
      * @param path 节点路径
      */
     public void deleteNodeGuaranteed(String path) throws Exception {
+        /*
+         * guaranteed()方法的作用：一旦客户端删除节点遇到网络错误或延迟等原因, 此方法就会记录下此次操作,
+         * 只要客户端有效, 就会在后台反复重试直至节点删除成功
+         */
         curatorFramework.delete().guaranteed().forPath(path);
         log.info("[删除zk节点]path:{}", path);
     }
@@ -144,7 +150,11 @@ public class CuratorTemplate {
      * @throws Exception 获取异常
      */
     public byte[] getData(String path) throws Exception {
-        return curatorFramework.getData().forPath(path);
+        /*
+         * 通过传入Stat对象, 来获取服务端的最新节点状态
+         */
+        Stat stat = new Stat();
+        return curatorFramework.getData().storingStatIn(stat).forPath(path);
     }
 
     /**

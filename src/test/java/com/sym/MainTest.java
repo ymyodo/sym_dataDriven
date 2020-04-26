@@ -1,6 +1,6 @@
 package com.sym;
 
-import com.sym.zookeeper.curator.CuratorTemplate;
+import com.sym.zookeeper.curator.example.CuratorBaseTemplate;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestClientFactory;
 import io.searchbox.client.config.HttpClientConfig;
@@ -36,7 +36,7 @@ public class MainTest {
 
     @Test
     public void zkTest() throws Exception {
-        CuratorTemplate template = new CuratorTemplate();
+        CuratorBaseTemplate template = new CuratorBaseTemplate();
         byte[] data = template.getData("/dubbo");
         System.out.println(data);
     }
