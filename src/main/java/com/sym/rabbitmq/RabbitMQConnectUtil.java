@@ -23,7 +23,7 @@ public class RabbitMQConnectUtil {
         configuration.setEncoding("utf-8");
         try {
             // 加载配置文件
-            configuration.load("rabbitmq.properties");
+            configuration.load("properties/rabbitmq.properties");
             String username = configuration.getString("username");
             String password = configuration.getString("password");
             String host = configuration.getString("host");
