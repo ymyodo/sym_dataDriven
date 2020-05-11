@@ -34,7 +34,7 @@ public class MongoUtil {
         Properties prop = new Properties();
         try {
             // 加载配置文件，获取mongo客户端连接
-            prop.load(MongoUtil.class.getResourceAsStream("mongo.properties"));
+            prop.load(MongoUtil.class.getResourceAsStream("properties/mongo.properties"));
             String host = String.valueOf(prop.get("mongo.host"));
             int port = Integer.parseInt(String.valueOf(prop.get("mongo.port")));
             client = new MongoClient(host, port);
