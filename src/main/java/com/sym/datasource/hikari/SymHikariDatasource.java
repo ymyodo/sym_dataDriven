@@ -15,9 +15,6 @@ import java.util.Properties;
  * Created on 2019/11/22.
  */
 public class SymHikariDatasource {
-    public static void main(String[] args) {
-        SymHikariDatasource.getConnection();
-    }
 
     /**
      * HikariCP的数据源, 里面定制了一个连接池, 存放JDBC的连接：Connection
