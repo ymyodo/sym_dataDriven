@@ -13,7 +13,7 @@ import java.io.IOException;
  * @date 2020/3/15 17:45
  */
 
-public class RabbitMQTest {
+public class RabbitmqTest {
 
     private Channel channel;
 
@@ -22,7 +22,7 @@ public class RabbitMQTest {
      */
     @Before
     public void init() {
-        channel = RabbitMQConnectUtil.getChannel();
+        channel = RabbitmqConnectUtil.getChannel();
     }
 
     /**
@@ -215,6 +215,6 @@ public class RabbitMQTest {
      */
     @After
     public void closeAll() {
-        RabbitMQConnectUtil.closeAll();
+        RabbitmqConnectUtil.closeAll();
     }
 }

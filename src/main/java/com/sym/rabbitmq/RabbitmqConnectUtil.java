@@ -13,7 +13,7 @@ import java.util.concurrent.TimeoutException;
  * @Auther: shenym
  * @Date: 2018-12-10 14:29
  */
-public class RabbitMQConnectUtil {
+public class RabbitmqConnectUtil {
 
     private static Connection connection;
     private static ThreadLocal<Channel> threadLocal;
@@ -67,7 +67,8 @@ public class RabbitMQConnectUtil {
                 channel = connection.createChannel();
                 threadLocal.set(channel);
             } catch (IOException e) {
-                e.printStackTrace();
+                // 暂时以运行时异常抛出
+                throw new RuntimeException("创建rabbitMQ连接通道失败");
             }
 
         }
@@ -101,19 +102,19 @@ public class RabbitMQConnectUtil {
             }
         }
     }
-    
-    
+
+
     // 测试连接
     public static void main(String[] args){
         new Thread(()->{
-            Channel channel = RabbitMQConnectUtil.getChannel();
+            Channel channel = RabbitmqConnectUtil.getChannel();
             System.out.println(Thread.currentThread().getName()+"获取的通道："+channel.toString()+",是否开启？"+channel.isOpen());
-            RabbitMQConnectUtil.close();
+            RabbitmqConnectUtil.close();
             System.out.println(Thread.currentThread().getName()+"获取的通道："+channel.toString()+",是否开启？"+channel.isOpen());
         },"线程1").start();
 
         new Thread(()->{
-            Channel channel = RabbitMQConnectUtil.getChannel();
+            Channel channel = RabbitmqConnectUtil.getChannel();
             System.out.println(Thread.currentThread().getName()+"获取的通道："+channel.toString()+",是否开启？"+channel.isOpen());
             //RabbitMQConnectUtil.close();
             System.out.println(Thread.currentThread().getName()+"获取的通道："+channel.toString()+",是否开启？"+channel.isOpen());

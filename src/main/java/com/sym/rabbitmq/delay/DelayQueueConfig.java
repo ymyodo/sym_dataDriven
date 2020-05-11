@@ -1,7 +1,7 @@
 package com.sym.rabbitmq.delay;
 
 import com.rabbitmq.client.*;
-import com.sym.rabbitmq.RabbitMQConnectUtil;
+import com.sym.rabbitmq.RabbitmqConnectUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -21,11 +21,10 @@ import java.util.concurrent.CountDownLatch;
 @Slf4j
 public class DelayQueueConfig {
 
-    private Channel channel = RabbitMQConnectUtil.getChannel();
+    private Channel channel = RabbitmqConnectUtil.getChannel();
     private String deadExchangeName = "dead-exchange";
     private String deadQueueName = "dead-queue";
     public static String orderExchangeName = "order-exchange";
-    private String orderQueueName = "order-queue";
 
     /**
      * 创建一个死信交换器, 它实际上就是一个普通的RabbitMQ交换器, 只不过队列中的死信消息
@@ -68,6 +67,7 @@ public class DelayQueueConfig {
         argument.put("x-dead-letter-exchange", deadExchangeName);
         argument.put("x-dead-letter-routing-key", ""); // 因为我的死信交换器类型设置为FANOUT, 所以这个routing-key设不设置都没差
         // argument.put("x-message-ttl", String.valueOf(10 * 1000)); //设置队列内消息的过期时间
+        String orderQueueName = "order-queue";
         AMQP.Queue.DeclareOk info = channel.queueDeclare(orderQueueName, false, false, true, argument);
         log.info("创建订单队列：{}", info);
 
