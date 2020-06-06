@@ -4,8 +4,11 @@ import com.sym.zookeeper.curator.example.CuratorBaseTemplate;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestClientFactory;
 import io.searchbox.client.config.HttpClientConfig;
+import org.apache.zookeeper.*;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.io.IOException;
 
 /**
  * 本地测试类
@@ -39,5 +42,34 @@ public class MainTest {
         CuratorBaseTemplate template = new CuratorBaseTemplate();
         byte[] data = template.getData("/dubbo");
         System.out.println(data);
+    }
+
+    @Test
+    public void test1() throws Exception {
+        ZooKeeper zooKeeper = new ZooKeeper("127.0.0.1:2181", 10000000, null);
+        while(!zooKeeper.getState().isConnected()){
+            Thread.sleep(1000);
+        }
+        zooKeeper.create("/test", "good".getBytes(), ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
+    }
+
+    @Test
+    public void test() throws IOException, InterruptedException, KeeperException {
+        ZooKeeper zooKeeper = new ZooKeeper("127.0.0.1:2181", 10000000, new Watcher() {
+            @Override
+            public void process(WatchedEvent event) {
+
+            }
+        });
+        while(!zooKeeper.getState().isConnected()){
+            Thread.sleep(1000);
+        }
+        byte[] bytes = zooKeeper.getData("/test", new Watcher() {
+            @Override
+            public void process(WatchedEvent event) {
+                System.out.println(event.getPath());
+            }
+        }, null);
+        System.out.println(new String(bytes));
     }
 }
