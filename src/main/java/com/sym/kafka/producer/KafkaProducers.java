@@ -26,11 +26,15 @@ public class KafkaProducers {
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, KafkaConstant.STRING_SERIALIZER);
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaConstant.STRING_SERIALIZER);
         props.put(ProducerConfig.RETRIES_CONFIG, KafkaConstant.RETRIES_COUNT);
+
+        // 设置响应
+        props.put(ProducerConfig.ACKS_CONFIG, "1");
+
         return createProducer(props);
     }
 
     /**
-     * 创建一个kafka producer
+     * 创建一个kafka producer, 它是线程安全的
      */
     public static <K, V> KafkaProducer<K, V> createProducer(Properties props) {
         return new KafkaProducer<>(props);

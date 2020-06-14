@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.common.TopicPartition;
 
 import java.time.Duration;
 import java.util.Collections;
@@ -33,6 +34,9 @@ public class KafkaConsumers {
 
         // 订阅主题
         consumer.subscribe(Collections.singletonList(KafkaConstant.TOPIC_NAME));
+
+        // 指定分区
+        consumer.assign(Collections.singleton(new TopicPartition("", 0)));
 
         // 不断地接受消息
         for (; ; ) {
