@@ -1,11 +1,13 @@
 package com.sym.kafka.producer.filter;
 
 import com.sym.kafka.domain.Order;
+import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerInterceptor;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * 自定义拦截器{@link ProducerInterceptor}
@@ -15,6 +17,13 @@ import java.util.Map;
  */
 
 public class OrderInterceptor implements ProducerInterceptor<String, Order> {
+
+    public static Properties properties(){
+        Properties prop = new Properties();
+        prop.put(ProducerConfig.INTERCEPTOR_CLASSES_CONFIG, "com.sym.kafka.producer.filter.OrderInterceptor");
+        return prop;
+    }
+
     @Override
     public ProducerRecord<String, Order> onSend(ProducerRecord<String, Order> record) {
         return null;
