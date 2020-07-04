@@ -16,9 +16,9 @@ import java.util.Properties;
 public class KafkaProducers {
 
     /**
-     * 创建一个默认配置的kafka producer
+     * 获取生产者的默认配置
      */
-    public static <K, V> KafkaProducer<K, V> createProducer() {
+    public static Properties initProperties(){
         // kafka producer 配置
         Properties props = new Properties();
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, KafkaConstant.KAFKA_BROKERS);
@@ -26,11 +26,16 @@ public class KafkaProducers {
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, KafkaConstant.STRING_SERIALIZER);
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaConstant.STRING_SERIALIZER);
         props.put(ProducerConfig.RETRIES_CONFIG, KafkaConstant.RETRIES_COUNT);
-
         // 设置响应
         props.put(ProducerConfig.ACKS_CONFIG, "1");
+        return props;
+    }
 
-        return createProducer(props);
+    /**
+     * 创建一个默认配置的kafka producer
+     */
+    public static <K, V> KafkaProducer<K, V> createProducer() {
+        return createProducer(initProperties());
     }
 
     /**

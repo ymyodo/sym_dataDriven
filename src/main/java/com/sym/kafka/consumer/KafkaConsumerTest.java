@@ -5,15 +5,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.apache.kafka.clients.producer.Partitioner;
 import org.apache.kafka.common.TopicPartition;
 import org.junit.Test;
 
-import javax.swing.*;
 import java.time.Duration;
 import java.util.Objects;
 import java.util.Properties;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 /**
@@ -35,7 +32,7 @@ public class KafkaConsumerTest {
         // 订阅默认主题
         consumer.subscribe(Pattern.compile(KafkaConstant.TOPIC_NAME));
 
-        for(;;){
+        for (; ; ) {
             Thread.sleep(500);
             ConsumerRecords<String, String> consumerRecords = consumer.poll(Duration.ofMillis(1000));
             consumerRecords.forEach(record -> {
@@ -57,7 +54,7 @@ public class KafkaConsumerTest {
         KafkaConsumer<String, String> consumer = KafkaConsumers.createConsumer(props);
         // 订阅默认主题
         consumer.subscribe(Pattern.compile(KafkaConstant.TOPIC_NAME));
-        for(;;){
+        for (; ; ) {
             Thread.sleep(500);
             ConsumerRecords<String, String> consumerRecords = consumer.poll(Duration.ofMillis(1000));
             consumerRecords.forEach(record -> {
@@ -80,13 +77,13 @@ public class KafkaConsumerTest {
         KafkaConsumer<String, String> consumer = KafkaConsumers.createConsumer(props);
         // 订阅默认主题
         consumer.subscribe(Pattern.compile(KafkaConstant.TOPIC_NAME));
-        for(;;){
+        for (; ; ) {
             Thread.sleep(500);
             ConsumerRecords<String, String> consumerRecords = consumer.poll(Duration.ofMillis(1000));
             consumerRecords.forEach(record -> {
                 log.info("偏移量：{}, 消息内容：{}", record.offset(), record.value());
                 consumer.commitAsync((offsets, exception) -> {
-                    if(Objects.isNull(exception)){
+                    if (Objects.isNull(exception)) {
                         log.info("异步提交结果:{}", offsets);
                     }
                 });
@@ -99,7 +96,7 @@ public class KafkaConsumerTest {
      */
     @Test
     public void seek() throws InterruptedException {
-// 设置不同的消费组
+        // 设置不同的消费组
         Properties props = KafkaConsumers.initProperties();
         props.put(ConsumerConfig.GROUP_ID_CONFIG, "group3");
 
@@ -109,7 +106,7 @@ public class KafkaConsumerTest {
         consumer.subscribe(Pattern.compile(KafkaConstant.TOPIC_NAME));
 
         // 消费三次
-        for(int i = 0; i < 3; i++){
+        for (int i = 0; i < 3; i++) {
             Thread.sleep(500);
             ConsumerRecords<String, String> consumerRecords = consumer.poll(Duration.ofMillis(1000));
             consumerRecords.forEach(record -> {
