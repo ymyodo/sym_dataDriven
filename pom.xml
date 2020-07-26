@@ -93,18 +93,19 @@
 
         <!-- zookeeper -->
         <!-- 使用curator与zk有版本要求, curator 4.x以上需要zk版本3.5x.-->
-        <!--我的zk版本是3.4x, 要么使用低版本的curator, 要么就排除掉curator自带的zk驱动, 然后再引入对应版本的zk驱动-->
+        <!-- 我的zk版本是3.4x, 要么使用低版本的curator, 要么就排除掉curator自带的zk驱动, 然后再引入对应版本的zk驱动-->
         <dependency>
             <groupId>org.apache.curator</groupId>
             <artifactId>curator-recipes</artifactId>
             <version>2.13.0</version>
         </dependency>
-        <!-- 引入 curator-recipes 就会自动包含下面的基础依赖-->
-        <!--        <dependency>-->
-        <!--            <groupId>org.apache.curator</groupId>-->
-        <!--            <artifactId>curator-framework</artifactId>-->
-        <!--            <version>2.13.0</version>-->
-        <!--        </dependency>-->
+
+        <!--canal-->
+        <dependency>
+            <groupId>com.alibaba.otter</groupId>
+            <artifactId>canal.client</artifactId>
+            <version>1.1.4</version>
+        </dependency>
 
         <!-- 数据源 -->
         <dependency>
