@@ -18,9 +18,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Arrays;
-import java.util.Calendar;
 
-import static org.jboss.netty.handler.codec.spdy.SpdyHeaders.HttpNames.PATH;
 
 /**
  * {@link CuratorFramework}的高级特性用例
