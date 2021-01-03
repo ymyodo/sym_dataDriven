@@ -2,7 +2,7 @@ package com.sym.rabbitmq.delay;
 
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
-import com.sym.rabbitmq.RabbitmqConnectUtil;
+import com.sym.rabbitmq.RabbitmqUtil;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,10 +36,9 @@ public class DelayQueueTest {
     }
 
 
-
     @Before
     public void init() throws IOException {
-        channel = RabbitmqConnectUtil.getChannel();
+        channel = RabbitmqUtil.getChannel();
         // 初始化必要的交换器和队列
         config = new DelayQueueConfig();
         config.initDeadExchange();
@@ -53,6 +52,6 @@ public class DelayQueueTest {
      */
     @After
     public void closeAll() {
-        RabbitmqConnectUtil.closeAll();
+        RabbitmqUtil.closeAll();
     }
 }

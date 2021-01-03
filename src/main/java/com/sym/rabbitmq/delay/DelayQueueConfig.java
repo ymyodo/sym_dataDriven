@@ -1,7 +1,7 @@
 package com.sym.rabbitmq.delay;
 
 import com.rabbitmq.client.*;
-import com.sym.rabbitmq.RabbitmqConnectUtil;
+import com.sym.rabbitmq.RabbitmqUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -21,7 +21,7 @@ import java.util.concurrent.CountDownLatch;
 @Slf4j
 public class DelayQueueConfig {
 
-    private Channel channel = RabbitmqConnectUtil.getChannel();
+    private Channel channel = RabbitmqUtil.getChannel();
     private String deadExchangeName = "dead-exchange";
     private String deadQueueName = "dead-queue";
     public static String orderExchangeName = "order-exchange";
@@ -31,8 +31,7 @@ public class DelayQueueConfig {
      * 转发它这边, 所以称它为死信交换器
      */
     public void initDeadExchange() throws IOException {
-        AMQP.Exchange.DeclareOk declareOk = channel.exchangeDeclare(deadExchangeName, BuiltinExchangeType.FANOUT,
-                false, true, null);
+        AMQP.Exchange.DeclareOk declareOk = channel.exchangeDeclare(deadExchangeName, BuiltinExchangeType.FANOUT, false, true, null);
         log.info("创建死信交换器: {}", declareOk);
     }
 
@@ -54,8 +53,7 @@ public class DelayQueueConfig {
      */
     public void createOrderQueue() throws IOException {
         // 创建订单交换器
-        AMQP.Exchange.DeclareOk declareOk = channel.exchangeDeclare(orderExchangeName, BuiltinExchangeType.DIRECT,
-                false, true, null);
+        AMQP.Exchange.DeclareOk declareOk = channel.exchangeDeclare(orderExchangeName, BuiltinExchangeType.DIRECT, false, true, null);
         log.info("创建订单交换器：{}", declareOk);
 
         // 创建订单队列, 需要设置两步：

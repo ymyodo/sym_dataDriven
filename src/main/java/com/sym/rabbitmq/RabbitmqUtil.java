@@ -287,12 +287,13 @@ public class RabbitmqUtil {
             AMQP.Confirm.SelectOk selectOk = channel.confirmSelect();
             AMQP.BasicProperties props = new AMQP.BasicProperties.Builder().contentType("text.json").contentEncoding("utf-8").timestamp(new Date()).build();
             channel.basicPublish(exchange, route, props, toBytes(msg));
+            // 串行等待rabbitmq响应, 实际效果其实和事务差不多
             return channel.waitForConfirms();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
-
+    
     /**
      * 接收消息
      *
