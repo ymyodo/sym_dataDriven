@@ -5,8 +5,8 @@ import com.alibaba.otter.canal.client.CanalConnectors;
 import com.alibaba.otter.canal.protocol.CanalEntry;
 import com.alibaba.otter.canal.protocol.Message;
 import com.google.gson.Gson;
+import com.sym.canal.config.CanalConfig;
 import com.sym.canal.handler.ICanalMessageHandler;
-import com.sym.canal.message.CanalMessage;
 import lombok.extern.slf4j.Slf4j;
 
 import java.net.InetSocketAddress;
@@ -14,25 +14,13 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 
 /**
+ * Canal client
+ *
  * @author shenyanming
  * @date 2020/7/26 11:53.
  */
 @Slf4j
 public class CanalClient implements Runnable {
-    /**
-     * 连接 canal server的配置信息
-     */
-    private static String CANAL_SERVER_HOST = "127.0.0.1";
-    private static int CANAL_SERVER_PORT = 11111;
-    private static String CANAL_SERVER_USERNAME = "";
-    private static String CANAL_SERVER_PASSWORD = "";
-    private static String DESTINATION = "example";
-
-
-    /**
-     * 从 canal server 拉取记录的最大条数
-     */
-    private static int MAX_BATCH_SIZE = 1000;
 
     /**
      * 运行状态
@@ -45,11 +33,16 @@ public class CanalClient implements Runnable {
     /**
      * 原子操作类
      */
-    private static AtomicIntegerFieldUpdater<CanalClient> STATUS_UPDATER =
+    private static final AtomicIntegerFieldUpdater<CanalClient> STATUS_UPDATER =
             AtomicIntegerFieldUpdater.newUpdater(CanalClient.class, "status");
 
     /**
-     * canal server连接器
+     * 配置类
+     */
+    private CanalConfig config;
+
+    /**
+     * canal server 连接器
      */
     private CanalConnector connector;
 
@@ -69,11 +62,6 @@ public class CanalClient implements Runnable {
     volatile int status;
 
 
-    /**
-     * 表示订阅哪些信息
-     */
-    private String filter = ".*\\..*";
-
     public CanalClient() {
         this(list -> {
             Gson gson = new Gson();
@@ -82,11 +70,13 @@ public class CanalClient implements Runnable {
     }
 
     public CanalClient(ICanalMessageHandler handler) {
-        connector = CanalConnectors.newSingleConnector(new InetSocketAddress(CANAL_SERVER_HOST, CANAL_SERVER_PORT),
-                DESTINATION, CANAL_SERVER_USERNAME, CANAL_SERVER_PASSWORD);
+        CanalConfig canalConfig = CanalConfig.defaultConfig();
+        connector = CanalConnectors.newSingleConnector(new InetSocketAddress(canalConfig.getHost(), canalConfig.getPost()),
+                canalConfig.getDestination(), canalConfig.getUsername(), canalConfig.getPassword());
         this.messageHandler = Objects.requireNonNull(handler);
         this.status = NONE;
         this.thread = new Thread(this);
+        this.config = canalConfig;
     }
 
     /**
@@ -114,10 +104,9 @@ public class CanalClient implements Runnable {
         }
     }
 
-
     private void process(List<CanalEntry.Entry> entryList, long batchId) {
-        List<CanalMessage> messageList = new ArrayList<>(entryList.size());
-        CanalMessage canalMessage;
+        List<ICanalMessageHandler.CanalMessage> messageList = new ArrayList<>(entryList.size());
+        ICanalMessageHandler.CanalMessage canalMessage;
         try {
             for (CanalEntry.Entry entry : entryList) {
                 // 只对行数据变化有兴趣
@@ -130,7 +119,7 @@ public class CanalClient implements Runnable {
                 // 获取表名
                 String tableName = entry.getHeader().getTableName();
                 // 组装数据
-                canalMessage = new CanalMessage();
+                canalMessage = new ICanalMessageHandler.CanalMessage();
                 canalMessage.setTableName(tableName);
                 canalMessage.parseCanalEventType(eventType);
                 // 针对增删改
@@ -187,12 +176,12 @@ public class CanalClient implements Runnable {
     @Override
     public void run() {
         connector.connect();
-        connector.subscribe(filter);
+        connector.subscribe(config.getFilter());
         connector.rollback();
         try {
             while (isRunning() && !thread.isInterrupted()) {
                 // 获取指定数量的数据
-                Message message = connector.getWithoutAck(MAX_BATCH_SIZE);
+                Message message = connector.getWithoutAck(config.getMaxBatchSize());
                 long batchId = message.getId();
                 int size = message.getEntries().size();
                 if (batchId == -1 || size == 0) {
@@ -208,9 +197,9 @@ public class CanalClient implements Runnable {
                 }
             }
         } finally {
-            if(thread.isInterrupted()){
+            if (thread.isInterrupted()) {
                 log.info("thread is interrupt, program exit");
-            }else{
+            } else {
                 log.info("client is closed, program exit");
             }
             connector.disconnect();

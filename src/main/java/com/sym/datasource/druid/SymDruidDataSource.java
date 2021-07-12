@@ -8,7 +8,8 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 /**
- * Druid(德鲁伊)的官方文档：https://github.com/alibaba/druid/wiki/%E9%A6%96%E9%A1%B5
+ * Druid(德鲁伊)的官方文档：
+ * https://github.com/alibaba/druid/wiki/%E9%A6%96%E9%A1%B5
  *
  * @author ym.shen
  * @date 2019/11/22

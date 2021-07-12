@@ -1,4 +1,4 @@
-package com.sym.redis.lettuce;
+package com.sym.redis;
 
 import com.lambdaworks.redis.RedisClient;
 import com.lambdaworks.redis.RedisFuture;

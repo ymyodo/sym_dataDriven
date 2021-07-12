@@ -1,5 +1,6 @@
-package com.sym.redis.redisson;
+package com.sym.redis;
 
+import com.sym.redis.redisson.RedissonClientUtil;
 import org.junit.Test;
 import org.redisson.api.RBloomFilter;
 import org.redisson.api.RBucket;

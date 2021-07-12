@@ -1,6 +1,7 @@
-package com.sym.kafka.producer;
+package com.sym.kafka;
 
 import com.sym.kafka.constant.KafkaConstant;
+import com.sym.kafka.producer.KafkaProducers;
 import com.sym.util.JSONUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.KafkaProducer;

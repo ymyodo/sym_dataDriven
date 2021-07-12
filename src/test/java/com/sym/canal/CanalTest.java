@@ -1,14 +1,18 @@
 package com.sym.canal;
 
+import com.sym.canal.CanalClient;
+import org.junit.Test;
+
 import java.util.Scanner;
 
 /**
  * @author shenyanming
- * @date 2020/7/26 14:20.
+ * Create on 2021/07/12 19:07
  */
-
 public class CanalTest {
-    public static void main(String[] args) {
+
+    @Test
+    public void start() {
         CanalClient canalClient = new CanalClient();
         Scanner sc = new Scanner(System.in);
 

@@ -9,7 +9,8 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 /**
- * HikariCP的官方文档：https://github.com/brettwooldridge/HikariCP#configuration-knobs-baby
+ * HikariCP的官方文档：
+ * https://github.com/brettwooldridge/HikariCP#configuration-knobs-baby
  *
  * @author ym.shen
  * Created on 2019/11/22.

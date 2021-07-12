@@ -1,8 +1,9 @@
-package com.sym.rabbitmq.delay;
+package com.sym.rabbitmq;
 
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.sym.rabbitmq.RabbitmqUtil;
+import com.sym.rabbitmq.delay.DelayQueueConfig;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,10 +13,10 @@ import java.util.concurrent.CountDownLatch;
 
 /**
  * @author shenyanming
- * @date 2020/5/10 10:35.
+ * @date 2021/1/1 16:33.
  */
 
-public class DelayQueueTest {
+public class RabbitmqTest {
 
     private Channel channel;
     private DelayQueueConfig config;
@@ -54,4 +55,5 @@ public class DelayQueueTest {
     public void closeAll() {
         RabbitmqUtil.closeAll();
     }
+
 }

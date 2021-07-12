@@ -1,4 +1,4 @@
-package com.sym.zookeeper.curator.example;
+package com.sym.zookeeper;
 
 import com.sym.zookeeper.curator.CuratorClientUtil;
 import lombok.extern.slf4j.Slf4j;

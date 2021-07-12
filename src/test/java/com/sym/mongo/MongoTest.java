@@ -1,11 +1,13 @@
-package com.sym.mongodb;
+package com.sym.mongo;
 // 使用静态导入，省去写"Filters."
+
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-import com.sym.mongodb.domain.Person;
+import com.sym.mongodb.MongoUtil;
+import lombok.Data;
 import org.bson.Document;
 import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
@@ -87,7 +89,7 @@ public class MongoTest {
      * 这种方式可以让MongoDB一个集合对应Java中的一个JavaBean
      */
     @Test
-    public void queryForBean(){
+    public void queryForBean() {
         CodecRegistry registries = CodecRegistries.fromRegistries(MongoClient.getDefaultCodecRegistry(),
                 CodecRegistries.fromProviders(PojoCodecProvider.builder().automatic(true).build()));
         MongoClientSettings settings = MongoClientSettings.builder().codecRegistry(registries).build();
@@ -102,6 +104,14 @@ public class MongoTest {
         person.setBad(250);
         person.setGood(500);
         personTable.insertOne(person);
+    }
+
+    @Data
+    public static class Person {
+        private int good;
+        private int bad;
+        private String name;
+        private boolean isDel;
     }
 }
 

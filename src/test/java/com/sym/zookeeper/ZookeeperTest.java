@@ -1,5 +1,6 @@
-package com.sym.zookeeper.origin;
+package com.sym.zookeeper;
 
+import com.sym.zookeeper.origin.ZookeeperClientUtil;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.zookeeper.*;
